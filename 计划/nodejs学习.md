@@ -41,3 +41,92 @@
     
     这是我们和我所认为的“进阶”JavaScript的第一次亲密接触，不过我们还是得循序渐进。现在，我们先接受这一点：在JavaScript中，一个函数可以作为另一个函数接收一个参数。我们可以先定义一个函数，然后传递，也可以在传递参数的地方直接定义函数。
 
+* 我理解到可以分成模块，通过`exports.start = start;`导出然后在需要用到的文件里面导入。good
+* 下面学习路由
+* >我们需要的所有数据都会包含在request对象中，该对象作为onRequest()回调函数的第一个参数传递。但是为了解析这些数据，我们需要额外的Node.JS模块，它们分别是url和querystring模块。
+
+                               url.parse(string).query
+                                           |
+           url.parse(string).pathname      |
+                       |                   |
+                       |                   |
+                     ------ -------------------
+    http://localhost:8888/start?foo=bar&hello=world
+                                ---       -----
+                                 |          |
+                                 |          |
+
+              querystring(string)["foo"]    |
+                                            |
+                         querystring(string)["hello"]
+
+##路由
+>在C++或C#中，当我们谈到对象，指的是类或者结构体的实例。对象根据他们实例化的模板（就是所谓的类），会拥有不同的属性和方法。但在JavaScript里对象不是这个概念。在JavaScript中，对象就是一个键/值对的集合 -- 你可以把JavaScript的对象想象成一个键为字符串类型的字典。但如果JavaScript的对象仅仅是键/值对的集合，它又怎么会拥有方法呢？好吧，这里的值可以是字符串、数字或者……函数！
+
+## 异步式I/O与事件式编程 ##
+
+* **阻塞与线程**
+> 什么是阻塞（block）呢？线程在执行中如果遇到磁盘读写或网络通信（统称为 I/O 操作），
+通常要耗费较长的时间，这时操作系统会剥夺这个线程的 CPU 控制权，使其暂停执行，同
+时将资源让给其他的工作线程，这种线程调度方式称为 阻塞。当 I/O 操作完毕时，操作系统
+将这个线程的阻塞状态解除，恢复其对CPU的控制权，令其继续执行。这种 I/O 模式就是通
+常的同步式 I/O（Synchronous I/O）或阻塞式 I/O （Blocking I/O）。
+   
+    function readFileCallBack(err, data) {
+    if (err) {
+    console.error(err);
+    } else {
+    console.log(data);
+    }
+    }
+    var fs = require('fs');
+    fs.readFile('file.txt', 'utf-8', readFileCallBack);
+    console.log('end.');
+
+>eg : fs.readFile 调用时所做的工作只是将异步式 I/O 请求发送给了操作系统，然后立即
+返回并执行后面的语句，执行完以后进入事件循环监听事件。当 fs 接收到 I/O 请求完成的
+事件时，事件循环会主动调用回调函数以完成后续工作。因此我们会先看到 end.，再看到
+file.txt 文件的内容。
+
+*   **事件**
+
+>Node.js 所有的异步 I/O 操作在完成时都会发送一个事件到事件队列。在开发者看来，事
+件由 EventEmitter 对象提供。前面提到的 fs.readFile 和 http.createServer 的回
+调函数都是通过 EventEmitter 来实现的。下面我们用一个简单的例子说明 EventEmitter
+的用法：
+
+    //event.js
+    var EventEmitter = require('events').EventEmitter;
+    var event = new EventEmitter();
+    event.on('some_event', function() {
+    console.log('some_event occured.');
+    });
+    setTimeout(function() {
+    event.emit('some_event');
+    }, 1000);
+
+>运行这段代码，1秒后控制台输出了 some_event occured.。其原理是 event 对象注册了事件 some_event 的一个监听器，然后我们通过 setTimeout 在1000毫秒以后向event对象发送事件 some_event，此时会调用 some_event 的监听器。
+
+* **模块和包** 
+
+
+	* 什么是模块？
+		 >Node.js 提供了 require 函数来调用其他模块，而且模块都是基于文件的，机制十分简单
+		 >
+	* 如何创建加载模块？
+		>Node.js 提供了 exports 和 require 两个对象，其中 exports 是模块公开的接口，require 用于从外部获取一个模块的接口，即所获取模块的 exports 对象。
+	* 单次加载，后面加载的会覆盖前面的
+	* ---------------
+	* 什么是包？
+		>包是在模块基础上更深一步的抽象，Node.js 的包类似于 C/C++ 的函数库或者 Java/.Net的类库
+		>即所谓的包。包通常是一些模块的集合，在模块的基础上提供了更高层的抽象，相当于提供了一些固定接口的函数库。通过定制package.json，我们可以创建更复杂、更完善、更符合规范的包用于发布
+	* 如何创建包？
+	>
+	    //somepackage/index.js	
+    	exports.hello = function() {
+   		 console.log('Hello.');
+		};然后在 somepackage 之外建立 getpackage.js，
+    	内容如下：//getpackage.js var somePackage = require('./somepackage'); 
+    		somePackage.hello();运行 node getpackage.js，控制台将输出结果 Hello.。
+
+	* 
