@@ -129,4 +129,57 @@ file.txt 文件的内容。
     	内容如下：//getpackage.js var somePackage = require('./somepackage'); 
     		somePackage.hello();运行 node getpackage.js，控制台将输出结果 Hello.。
 
-	* 
+## 核心模块 ##
+
+*   **全局对象**
+	>  Node.js 中的全局对象是 global，所有全局变量（除了 global 本身以外）都是 global对象的属性。
+	* *全局对象与全局变量*
+		> global 最根本的作用是作为全局变量的宿主。按照 ECMAScript 的定义，满足以下条件的变量是全局变量：
+ 在最外层定义的变量；
+ 全局对象的属性；
+ 隐式定义的变量（未定义直接赋值的变量）。
+	
+	* 	> process 是一个全局变量，即 global 对象的属性。它用于描述当前 Node.js 进程状态的对象，提供了一个与操作系统的简单接口。
+	* 	console 用于标准的输出
+	* 	util 是一个 Node.js 核心模块，提供常用函数的集合，用于弥补核心 JavaScript 的功能过于精简的不足。
+		> **util.inherits**:Sub 仅仅继承了 Base 在原型中定义的函数，而构造函数内部创造的 base 属性和 sayHello 函数都没有被 Sub 继承。同时，在原型中定义的属性不会被 console.log 作为对象的属性输出
+		> **util.inspect(object,[showHidden],[depth],[colors])**:是一个将任意对象转换为字符串的方法，通常用于调试和错误输出。它至少接受一个参数 object，即要转换的对象。
+		>
+				        var util = require('util');
+			    function Person() {
+			    this.name = 'byvoid';
+			    this.toString = function() {
+			    return this.name;
+			    };
+			    }
+			    var obj = new Person();
+			    console.log(util.inspect(obj));
+			    console.log(util.inspect(obj, true));
+
+		>事件驱动 events 事件的发射和监听
+		>
+				var events = require('events');
+			var emitter = new events.EventEmitter();
+			emitter.on('someEvent', function(arg1, arg2) {
+			console.log('listener1', arg1, arg2);
+			});
+			emitter.on('someEvent', function(arg1, arg2) {
+			console.log('listener2', arg1, arg2);
+			});
+			emitter.emit('someEvent', 'byvoid', 1991);
+
+
+		* EventEmitter.on(event, listener) 为指定事件注册一个监听器，接受一个字符串 event 和一个回调函数 listener。
+		* EventEmitter.emit(event, [arg1], [arg2], [...]) 发射 event 事件，传递若干可选参数到事件监听器的参数表。
+		* EventEmitter.once(event, listener) 为指定事件注册一个单次监听器，即
+		监听器最多只会触发一次，触发后立刻解除该监听器。
+		* EventEmitter.removeListener(event, listener) 移除指定事件的某个监听
+		器，listener 必须是该事件已经注册过的监听器。
+		*EventEmitter.removeAllListeners([event]) 移除所有事件的所有监听器，如果指定 event，则移除指定事件的所有监听器。
+		
+		> #### 文件系统 ####
+		> ### http服务器与客户端 ###
+*   **常用工具**
+*   **事件机制**
+*   **文件系统访问**
+*   **http服务器与客户端**
