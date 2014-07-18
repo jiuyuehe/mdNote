@@ -35,6 +35,7 @@
 	git commite -m "add a new note" [提交]
 	git push -u mdNote master [推送到github]
 ```
+	别忘了顺便把博客发布到cnblogs。其实我就是因为能方便写markdwon并发布到博客园而 干这件事的。
 
 
 
